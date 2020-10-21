@@ -27,7 +27,7 @@ const int SCREEN_HEIGHT = 480;
 const int GRID_HEIGHT = 20;
 const int GRID_WIDTH = 20;
 
-const int CLOCK_PERIOD = 1;
+const int CLOCK_PERIOD = 100;
 const auto SDL_COLOR_BLACK = SDL_Color {.r= 0, .g = 0x0, .b = 0, .a = 0xff };
 const auto SDL_COLOR_RED = SDL_Color {.r= 0xff, .g = 0x0, .b = 0, .a = 0xff };
 const auto SDL_COLOR_GREEN = SDL_Color {.r= 0x0, .g = 0xff, .b = 0, .a = 0xff };
@@ -125,45 +125,25 @@ public:
 
 	bool isAtDest() const { return ( dest.first == pos.first and dest.second == pos.second); }
 	void move() {
-//		int stPos = pos.first + width * pos.second;
-		//std::cout << stPos << std::endl;	
-		//std::cout << st << std::endl;
-		//std::cout << pos.first << " " << pos.second << std::endl;
-//		if (isAtDest()){
-			// exit(1);
-			// std::cout << "YESS" << std::endl;
-//			while (!S.empty()) {
-//				iip ppos = S.top();
-//				st[ppos.first + width * ppos.second] = 'p';
-//				S.pop();
-//			}
-			//std::cout << toString() << std::endl;
-//		}
-//		else
 		if (!Q.empty()) {
 		    iip tmpPos = Q.front(); Q.pop();
 
 
             int stPos = tmpPos.first + width * tmpPos.second;
-//            std::cout << stPos << std::endl;
             int tmpDist = st[stPos];
             if (st[stPos + 1] == '.') {
-//                std::cout << "right" << std::endl;
                 st[stPos + 1] = tmpDist+1;
                 Q.push(iip(tmpPos.first+1,tmpPos.second));
             }
             if (st[stPos - width] == '.') {
-//                std::cout << "up" << std::endl;
                 st[stPos - width] = tmpDist+1;
                 Q.push(iip(tmpPos.first,tmpPos.second-1));
             }
             if (st[stPos - 1] == '.') {
-//                std::cout << "left" << std::endl;
                 st[stPos - 1] = tmpDist+1;
                 Q.push(iip(tmpPos.first-1,tmpPos.second));
             }
             if (st[stPos + width] == '.') {
-//                std::cout << "down" << std::endl;
                 st[stPos + width] = tmpDist+1;
                 Q.push(iip(tmpPos.first, tmpPos.second + 1));
             }
@@ -188,55 +168,6 @@ public:
 
 };
 
-// A class to represent the snake
-class snake {
-private:
-    // A snake is represented by a vector of the positions of its parts.
-    // It starts with just one piece at coordinate (2,1)
-    std::vector<iip> V{iip(2,1)};
-
-public:
-    // function appleCollision:
-    //    If the head of the snake is in the same position as
-    //    the apple, we extend the snake's tail and return true.
-    bool appleCollision(const iip& apple, const iip& last) {
-        if (apple.first == V[0].first and apple.second == V[0].second) {
-            V.push_back(last);
-            return true;
-        }
-        return false;
-    }
-
-    // function move:
-    //    Given the coordinate of the apple, and the direction of movement
-    //    modifies the snake chunks.
-    int move(const iip& apple, char direction) {
-        iip last = V[V.size()-1];
-
-        // remove the last element
-        V.erase(V.begin()+V.size()-1);
-
-        iip head = V[0];
-
-        if (direction == 'R') head.first++;
-        else if (direction == 'L') head.first--;
-        else if (direction == 'U') head.second++;
-        else if (direction == 'D') head.second--;
-
-        // insert at the first position
-        V.insert(V.begin(),iip(head));
-
-        return appleCollision(apple, last);
-    }
-
-    // function getV:
-    //    Just a getter for the vector of 2D coordinates.
-    const std::vector<iip> & getV() const {
-        return V;
-    }
-};
-
-
 // function init:
 //    Initializes several of the structures needed by SDL.
 //    Also creates the main window.
@@ -258,7 +189,7 @@ bool init() {
 		}
 
 		//Create window
-		gWindow = SDL_CreateWindow( "Snake", SDL_WINDOWPOS_UNDEFINED,
+		gWindow = SDL_CreateWindow( "Breadth First (using queue)", SDL_WINDOWPOS_UNDEFINED,
 		        SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if( gWindow == NULL ) {
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -404,7 +335,7 @@ void drawAxis(SDL_Renderer* renderer) {
 
 int main( int argc, char* args[] ) {
 	// the snake object
-    snake aSnake;
+
     maze myMaze("maze02.txt");
     std::cout << myMaze.toString() <<  std::endl;
 
@@ -452,46 +383,17 @@ int main( int argc, char* args[] ) {
 				while( SDL_PollEvent( &e ) != 0 ) {
 					//User requests quit
 					if( e.type == SDL_QUIT ) { quit = true;}
-
-					else if (e.type == SDL_KEYDOWN ) {
-						if ( e.key.keysym.sym== SDLK_q)      quit = true;
-						else if ( e.key.keysym.sym== SDLK_h) key = 'L';
-						else if ( e.key.keysym.sym== SDLK_l) key = 'R';
-						else if ( e.key.keysym.sym== SDLK_j) key = 'D';
-						else if ( e.key.keysym.sym== SDLK_k) key = 'U';
-					}
 				}
-
 				//Clear screen
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
 
-                int result = 0;
-
                 // this block decides if it is time to move. We move
                 // approximately CLOCK_PERIOD ticks
                 if (prevTicks / CLOCK_PERIOD < delta.get_ticks()/CLOCK_PERIOD) {
-                	// if(!myMaze.isAtDest()) {
-                		myMaze.move();
-                	// }
-                	// else {
-                		//
-                	// }
-                    result = 0; //aSnake.move(apple,key);
-                    if (result) {
-                        apple.first  = rand()%(GRID_WIDTH-1) + 1;
-                        apple.second = rand()%(GRID_HEIGHT-1) + 1;
-                    }
+                    myMaze.move();
                 }
                 prevTicks  = delta.get_ticks();
-
-				// read the list of positions of the snake and draw them
-				tmpV = aSnake.getV();
-				// for (int i = 0; i < tmpV.size(); i++)
-					// drawPoint(gRenderer, tmpV[i], SDL_COLOR_BLACK);
-
-                // draw the apple
-				drawPoint(gRenderer, apple, SDL_COLOR_RED);
 
 				drawAxis(gRenderer);
 				drawMaze(gRenderer, myMaze);
