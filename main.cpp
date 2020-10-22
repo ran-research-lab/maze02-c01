@@ -92,7 +92,7 @@ private:
 	std::string st;
 	std::pair<int,int> origin;
 	std::pair<int,int> dest;
-	std::pair<int,int> pos;
+//	std::pair<int,int> pos;
 	int width, height;
 	std::queue<iip> Q;
 public:
@@ -107,27 +107,22 @@ public:
 
 		
 		inFile >> width >> height;
-		std::cout << height << std::endl;
 		inFile >> origin.first >> origin.second;
-		pos = origin;
 		inFile >> dest.first >> dest.second;
 		st = "";
 
 		for (int i = 0; i < height; i++) {
 			inFile >> tmp;
-			std::cout << tmp << std::endl;
 			st = tmp + st;
 		}
 
 		Q.push(origin);
-        st[pos.first + width * pos.second] = 1;
+        st[origin.first + width * origin.second] = 1;
 	}
 
-	bool isAtDest() const { return ( dest.first == pos.first and dest.second == pos.second); }
 	void move() {
 		if (!Q.empty()) {
 		    iip tmpPos = Q.front(); Q.pop();
-
 
             int stPos = tmpPos.first + width * tmpPos.second;
             int tmpDist = st[stPos];
@@ -162,8 +157,7 @@ public:
 	}
 	const std::string &getSt() const {return st; }
 	int getWidth() const {return width; }
-	int getHeight() const {return height; }
-	const iip &getPos() const {return pos; }
+
 
 
 };
@@ -290,6 +284,8 @@ void drawPoint(SDL_Renderer* renderer, const iip &p, const SDL_Color& color){
 	SDL_RenderFillRect( gRenderer, &fillRect );
 }
 
+// Draw the text at the specified position
+
 void drawText(SDL_Renderer* renderer, int x, int y,
               const SDL_Color& color, std::string txt, TTF_Font *font , int justify = 0){
     LTexture gText(renderer);
@@ -299,22 +295,28 @@ void drawText(SDL_Renderer* renderer, int x, int y,
     gText.render( x, y );
 }
 
+
+
+// Draws the entire maze
+
 void drawMaze(SDL_Renderer* renderer, const maze &m){
-	const std::string mazeSt = m.getSt();
-	for(int i = 0; i < mazeSt.length(); i++) {
-		if (mazeSt[i] == '*') 
-			drawPoint(renderer, iip(i % m.getWidth(), i / m.getWidth()), SDL_COLOR_BLACK);
+    const std::string mazeSt = m.getSt();
+    int mazeWidth = m.getWidth();
+
+    for(int i = 0; i < mazeSt.length(); i++) {
+        iip tmppos(i % mazeWidth,i / mazeWidth);
+        if (mazeSt[i] == '*')
+            drawPoint(renderer, tmppos, SDL_COLOR_BLACK);
         else if (mazeSt[i] == 'p')
-            drawPoint(renderer, iip(i % m.getWidth(), i / m.getWidth()), SDL_COLOR_GREEN);
+            drawPoint(renderer, tmppos, SDL_COLOR_GREEN);
         else if (mazeSt[i] != '.') {
-            drawPoint(renderer, iip(i % m.getWidth(), i / m.getWidth()), SDL_COLOR_GREEN);
+            drawPoint(renderer, tmppos, SDL_COLOR_GREEN);
             drawText(renderer, xf*(i % m.getWidth()),SCREEN_HEIGHT - yf*(i / m.getWidth() +1),
-                    SDL_COLOR_RED, std::to_string(mazeSt[i]), gFontTiny);
+                     SDL_COLOR_RED, std::to_string(mazeSt[i]), gFontTiny);
 
         }
     }
-	const iip pos = m.getPos();
-	drawPoint(renderer, pos, SDL_COLOR_RED);
+
 
 }
 
