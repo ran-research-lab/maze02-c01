@@ -92,9 +92,8 @@ private:
 	std::string st;
 	std::pair<int,int> origin;
 	std::pair<int,int> dest;
-//	std::pair<int,int> pos;
 	int width, height;
-	std::queue<iip> Q;
+	std::queue<iip> Q;  // queue used during exploration
 public:
 	maze(const std::string& fileName) {
 		std::ifstream inFile(fileName);
@@ -120,6 +119,9 @@ public:
         st[origin.first + width * origin.second] = 1;
 	}
 
+	// Each time this function is called it performs a step
+	// in the breadth first exploration of the maze. To mark a cell
+	// as visited it writes the distance into that cell.
 	void move() {
 		if (!Q.empty()) {
 		    iip tmpPos = Q.front(); Q.pop();
@@ -155,10 +157,10 @@ public:
 		}
 		return res;
 	}
+
 	const std::string &getSt() const {return st; }
+
 	int getWidth() const {return width; }
-
-
 
 };
 
