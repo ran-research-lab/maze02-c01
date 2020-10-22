@@ -339,27 +339,18 @@ int main( int argc, char* args[] ) {
     maze myMaze("maze02.txt");
     std::cout << myMaze.toString() <<  std::endl;
 
-    // the apple is just a random coordinate
-    iip apple(rand()%(GRID_WIDTH-1) + 1,rand()%(GRID_HEIGHT-1) + 1);
-	
+
     // a time object to keep track of time
 	Timer delta;
 
 	// this variable keeps track of the ticks the last time we entered
 	// the game loop
 	int prevTicks = 0;
-	
-	// the key pressed by the user, we initialize to R
-	char key = 'R';
-
-	// a temporary vector for reading the data vector of the snake
-    std::vector<iip> tmpV;
 
     // compute the number of pixels per grid square
     // we will need these for paiting the snake and apple
     xf = SCREEN_WIDTH  / GRID_WIDTH;
     yf = SCREEN_HEIGHT / GRID_HEIGHT; 
-
 
 	//Start up SDL and create window
 	if( !init() ) {
